@@ -1,0 +1,98 @@
+<div class="result"><p id="notice"><%= notice %></p>
+
+<h2>You Are Currently Standing At...</h2>
+
+<p>
+ 
+  <%= @location.my_location %>
+</p>
+
+<h2>The Closest Buses Are...</h2>
+
+<% if @bus_count == 0 %>
+
+<p id="uhoh">Sorry, We're not really that close, better call an Uber!</p>
+
+<% end %>
+
+<% @nearby_buses.each_with_index do |bus| %>
+  <p>
+    <strong>Route:</strong> <%= bus["ROUTE"] %><br />
+    <strong>Vehicle:</strong> <%= bus["VEHICLE"] %><br />
+    <strong>Next Stop:</strong> <%= bus["TIMEPOINT"] %>
+  </p>
+<% end %>
+
+
+
+<% @nearby_buses.each_with_index do |bus, index| %>
+  <p>
+    <strong>Route:</strong> <%= bus["ROUTE"] %><br />
+    <strong>Vehicle:</strong> <%= bus["VEHICLE"] %><br />
+    <strong>Next Stop:</strong> <%= bus["TIMEPOINT"] %>
+  </p>
+
+
+<!-- Our Maps with Javascript-->
+<script>
+
+$(document).ready(function (){
+    function initialize(){
+     var userCoords = new google.maps.LatLng(<%= @location.latitude %>,         <%= @location.longitude %>);
+     var busCoords = new google.maps.LatLng(<%= bus["LATITUDE"] %>, <%= bus["LONGITUDE"] %>);
+
+      var mapOptions = {
+		center: userCoords,
+	zoom: 13,
+	scrollwheel: false
+      };
+		      
+      var map = new google.maps.Map(document.getElementById('map-canvas<%= index %>'), mapOptions);
+
+      
+    
+      var contentStringBus = "A bus is here!"; 
+
+      var contentStringUser = "You are here!";
+
+
+
+      var busMarker = new google.maps.Marker({ 
+      	position: busCoords, map: map, animation: google.maps.Animation.DROP
+      });
+
+  
+      var userMarker = new google.maps.Marker({ 
+      	position: userCoords, map: map, animation: google.maps.Animation.DROP
+      });
+
+  
+      var infoWindowBus = new google.maps.InfoWindow({
+      	content: contentStringBus
+      });
+
+      google.maps.event.addListener(busMarker, 'click', function() {
+      	infoWindowBus.open(map,busMarker);
+      });
+
+ 
+      var infoWindowUser = new google.maps.InfoWindow({ 
+      	content: contentStringUser
+      });
+
+      google.maps.event.addListener(userMarker, 'click', function() {
+        infoWindowUser.open(map,userMarker);
+      });
+
+    }
+  
+  google.maps.event.addDomListener(window, 'load', initialize);
+  });
+		
+</script>
+  <div class="bus_map" id="map-canvas<%= index %>"></div>
+
+<% end %>
+
+
+  </div>
